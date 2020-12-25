@@ -12,24 +12,23 @@ RSpec.describe "when a search is executed" do
     expect(response).to have_http_status(200)
 
     parsed.each do |movie|
-      assert_equal true, movie['Title'].downcase.include?(search_term), "entry does not match search term (#{search_term})"
+      expect(movie['Title'].downcase.include?(search_term)).to be_truthy, "entry does not match search term (#{search_term})"
 
       # happy path - has required keys
       required_keys = %w[Title Year imdbID Type Poster count details]
       movie.all? do |key, value|
-        assert_equal true, required_keys.include?(key), "this entry is missing one or more required keys (#{required_keys})"
-        assert_equal true, (value.is_a?(String) || value.is_a?(Numeric) || value.is_a?(Hash)), "this value #{value} is not a string"
+        expect(required_keys.include?(key)).to be_truthy, "this entry is missing one or more required keys (#{required_keys})"
+        expect(value.is_a?(String) || value.is_a?(Numeric) || value.is_a?(Hash)).to be_truthy, "this value #{value} is not a string"
       end
 
       # sad path- test will fail if missing a key
       required_keys = %w[Extra_key]
       movie.all? do |key, value|
-        assert_equal false, required_keys.include?(key)
+        expect(required_keys.include?(key)).to be_falsey
       end
-
-      assert_equal false, movie['Year'].nil?
-      assert_equal true, Date.strptime(movie['Year'], '%y').gregorian?
-      assert_equal true, movie['Year'].to_i.between?(1900, 2999)
+      expect(movie['Year']).to_not be_nil
+      expect(Date.strptime(movie['Year'], '%y').gregorian?).to eq(true)
+      expect(movie['Year'].to_i.between?(1900, 2999)).to be_truthy
     end
   end
 
@@ -44,9 +43,9 @@ RSpec.describe "when a search is executed" do
     expect(response).to have_http_status(200)
     parsed = JSON.parse(response.body)
 
-    assert_equal ('application/json; charset=utf-8'), response.headers['content-type']
-    assert_equal 'No API key provided.', parsed['Error']
-    assert_equal 'False', parsed['Response']
+    expect(response.headers['content-type']).to eq(('application/json; charset=utf-8')) 
+    expect(parsed['Error']).to eq('No API key provided.')
+    expect(parsed['Response']).to eq('False')
 
     # teardown
     ENV['OMDB_KEY'] = old_omdb_key
@@ -59,9 +58,9 @@ RSpec.describe "when a search is executed" do
     parsed = JSON.parse(response.body)
     expect(response).to have_http_status(200)
 
-    assert_equal 'application/json; charset=utf-8', response.headers['content-type']
-    assert_equal 'True', parsed['Response']
-    assert_equal false, parsed['Title'].nil?
+    expect(response.headers['content-type']).to eq('application/json; charset=utf-8')
+    expect(parsed['Response']).to eq('True')
+    expect(parsed['Title'].nil?).to be_falsey
   end
 
   # Sad Path - The api doesn't allow long, short searches.  For example, 't' instead of 'thomas'
@@ -72,8 +71,8 @@ RSpec.describe "when a search is executed" do
     expect(response).to have_http_status(200)
     parsed = JSON.parse(response.body)
 
-    assert_equal 'False', parsed['Response']
-    assert_equal 'Too many results.', parsed['Error']
+    expect(parsed['Response']).to eq('False')
+    expect(parsed['Error']).to eq('Too many results.')
   end
 
   it 'test_page_one_title_is_valid_using_i_parameter' do
@@ -92,9 +91,9 @@ RSpec.describe "when a search is executed" do
 
       parsed = JSON.parse(response.body)
 
-      assert_equal 200, response.status
-      assert_equal 'True', parsed['Response']
-      assert_equal false, parsed['Title'].nil?
+      expect(response).to have_http_status(200)
+      expect(parsed['Response']).to eq('True')
+      expect(parsed['Title'].nil?).to eq(false)
     end
   end
 
@@ -105,9 +104,9 @@ RSpec.describe "when a search is executed" do
 
     parsed = JSON.parse(response.body)
 
-    assert_equal 200, response.status
-    assert_equal 'False', parsed['Response']
-    assert_equal true, parsed['Title'].nil?
+    expect(response).to have_http_status(200)
+    expect(parsed['Response']).to eq('False')
+    expect(parsed['Title'].nil?).to eq(true)
   end
 
   it 'test_all_poster_links_on_page_one_valid' do 
@@ -117,7 +116,7 @@ RSpec.describe "when a search is executed" do
 
     parsed = JSON.parse(response.body)
 
-    assert_equal 200, response.status
+    expect(response).to have_http_status(200)
     searched_movies = parsed
 
     searched_movies.each do |movie|
@@ -125,8 +124,7 @@ RSpec.describe "when a search is executed" do
 
       poster_request = Faraday.get(poster_url)
 
-      assert_equal 200, poster_request.status
-
+      expect(poster_request.status).to eq(200)
       expect(poster_request.headers['content-type']).to eq("image/jpeg")
     end
   end
@@ -137,7 +135,7 @@ RSpec.describe "when a search is executed" do
 
     poster_request = Faraday.get(bad_poster_url)
 
-    assert_equal 404, poster_request.status
+    expect(poster_request.status).to eq(404)
   end
 
   it 'test_no_duplicate_records_within_first_n_pages' do 
@@ -153,7 +151,7 @@ RSpec.describe "when a search is executed" do
 
       searched_movies = parsed
       searched_movies.each do |movie|
-        assert_equal false, @seen_movie_ids.include?(movie['imdbID']), "There is a duplicate movie with imdbID - #{movie['imdbID']} within page - #{page_num}"
+        expect(@seen_movie_ids.include?(movie['imdbID'])).to be_falsey, "There is a duplicate movie with imdbID - #{movie['imdbID']} within page - #{page_num}"
         @seen_movie_ids << movie['imdbID']
       end
       page_num += 1
@@ -177,7 +175,7 @@ RSpec.describe "when a search is executed" do
       searched_movies.each { |movie| @seen_movie_ids << movie['imdbID'] }
 
       searched_movies.each do |movie|
-        assert_equal true, @seen_movie_ids.include?(movie['imdbID'])
+        expect(@seen_movie_ids.include?(movie['imdbID'])).to be_truthy
         @seen_movie_ids << movie['imdbID']
       end
     end
