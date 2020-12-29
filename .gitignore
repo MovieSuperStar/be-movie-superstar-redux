@@ -29,3 +29,6 @@
 vendor/
 # Ignore application configuration
 /config/application.yml
+
+# ignore simplecov
+coverage/

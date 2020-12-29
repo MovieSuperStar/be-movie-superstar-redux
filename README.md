@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/jobannon/testing_movies.svg?style=svg)](https://app.circleci.com/pipelines/github/jobannon/be-movie-superstar-redux)
+![SCov](https://img.shields.io/badge/SCov-100%25-brightgreen)
 [![Ruby Style Guide](https://img.shields.io/badge/code_style-rubocop-brightgreen.svg)](https://github.com/rubocop-hq/rubocop)
 
 ## Please see [wiki](https://github.com/jobannon/superstar-api/wiki) for notes about this project.
