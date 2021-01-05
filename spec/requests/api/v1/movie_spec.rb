@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "when a search is executed" do
+RSpec.describe 'when a search is executed' do
   it 'can return results for search_term' do
     search_term = 'thomas'
 
@@ -32,11 +32,11 @@ RSpec.describe "when a search is executed" do
     end
   end
 
-  it 'it returns no api key provided without the proper credentials' do
+  it 'returns no api key provided without the proper credentials' do
     search_term = 'thomas'
 
     old_omdb_key = ENV['OMDB_KEY']
-    ENV['OMDB_KEY'] = ""
+    ENV['OMDB_KEY'] = ''
 
     get "/api/v1/movies?s=#{search_term}"
 
@@ -51,7 +51,7 @@ RSpec.describe "when a search is executed" do
     ENV['OMDB_KEY'] = old_omdb_key
   end
 
-  it 'test_with_api_key_and_i_value_successful_response' do
+  it 'can test with api key and i value successful response' do
     random_imdbid_value = 'tt3896198'
     get "/api/v1/movies?i=#{random_imdbid_value}"
 
@@ -64,7 +64,7 @@ RSpec.describe "when a search is executed" do
   end
 
   # Sad Path - The api doesn't allow long, short searches.  For example, 't' instead of 'thomas'
-  it 'test_search_capability_with_too_short_keyword' do
+  it 'can test search capability with too short keyword' do
     search_term = 't'
     get "/api/v1/movies?s=#{search_term}"
 
@@ -75,7 +75,7 @@ RSpec.describe "when a search is executed" do
     expect(parsed['Error']).to eq('Too many results.')
   end
 
-  it 'test_page_one_title_is_valid_using_i_parameter' do
+  it 'can test page one title is valid using i parameter' do
     search_term = 'thomas'
     page_num = 1
 
@@ -98,7 +98,7 @@ RSpec.describe "when a search is executed" do
   end
 
   # sad path - check with an intentionally bad imdbID value
-  it 'test_page_one_title_is_invalid_using_invalid_i_parameter' do
+  it 'can test page one title is invalid using invalid i parameter' do
     wrong_imdbid_value = 11111111111
     get "/api/v1/movies?i=#{wrong_imdbid_value}&apikey=#{ENV['OMDB_KEY']}"
 
@@ -109,7 +109,7 @@ RSpec.describe "when a search is executed" do
     expect(parsed['Title'].nil?).to eq(true)
   end
 
-  it 'test_all_poster_links_on_page_one_valid' do 
+  it 'can test all poster links on page one valid' do
     search_term = 'thomas'
     page_num = 1
     get "/api/v1/movies?s=#{search_term}&apikey=#{ENV['OMDB_KEY']}&page=#{page_num}"
@@ -125,12 +125,12 @@ RSpec.describe "when a search is executed" do
       poster_request = Faraday.get(poster_url)
 
       expect(poster_request.status).to eq(200)
-      expect(poster_request.headers['content-type']).to eq("image/jpeg")
+      expect(poster_request.headers['content-type']).to eq('image/jpeg')
     end
   end
 
   # sad path - check with an intentinally bad url 
-  it 'test_reports_poster_link_invalid_with_bad_link' do 
+  it 'can test reports poster link invalid with bad link' do
     bad_poster_url = 'https://m.media-amazon.com/images/M/link_to_nowhere.jpg'
 
     poster_request = Faraday.get(bad_poster_url)
@@ -138,7 +138,7 @@ RSpec.describe "when a search is executed" do
     expect(poster_request.status).to eq(404)
   end
 
-  it 'test_no_duplicate_records_within_first_n_pages' do 
+  it 'can test no duplicate records within first n pages' do
     search_term = 'thomas'
     page_num = 1
     number_of_pages = 5
@@ -159,7 +159,7 @@ RSpec.describe "when a search is executed" do
   end
 
   # sad path - search contains duplication
-  it 'test_duplicate_records_found_within_first_n_pages' do 
+  it 'can test no duplicate records found within first n pages' do
     search_term = 'thomas'
     page_num = 1
     number_of_pages = 5
