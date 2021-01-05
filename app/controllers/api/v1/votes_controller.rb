@@ -10,8 +10,9 @@ class Api::V1::VotesController < ApplicationController
   end
 
   def index 
-    this_vote = Vote.find_by(imdb_id: vote_params[:imdbid])
-    render json: this_vote.count
+    #not implemented on the FrontEnd yet
+    # this_vote = Vote.find_by(imdb_id: vote_params[:imdbid])
+    # render json: this_vote.count
   end
 
   private 
