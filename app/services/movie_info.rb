@@ -9,16 +9,17 @@ class MovieInfo
     if json_response['Search'].nil?
       get_json
     else
-      added_content = add_count_other(get_json)
-      added_content
+      add_count_other(get_json)
     end
   end
 
   private
 
   def get_json
-    response = Faraday.get("http://www.omdbapi.com?#{@query_params}&apikey=#{ENV['OMDB_KEY']}")
-    JSON.parse(response.body)
+    Rails.cache.fetch(@query_params, :expires => 1.hour) do
+      response = Faraday.get("http://www.omdbapi.com?#{@query_params}&apikey=#{ENV['OMDB_KEY']}")
+      JSON.parse(response.body)
+    end
   end
 
   def add_count_other(raw_json)
