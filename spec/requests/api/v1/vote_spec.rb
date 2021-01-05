@@ -5,10 +5,9 @@ RSpec.describe 'when executing a vote', type: :request do
     vote_direction = 1 # thumbs up 
 
     incoming_imdb_id = 'tt0454349'
-    Vote.create!(imdb_id: incoming_imdb_id, count: 0)
 
     before_vote = Vote.find_by(imdb_id: incoming_imdb_id)
-    expect(before_vote.count).to eq(0)
+    expect(before_vote).to be_nil
 
     post "/api/v1/votes?vote=#{vote_direction}&imdbid=#{incoming_imdb_id}"
 
