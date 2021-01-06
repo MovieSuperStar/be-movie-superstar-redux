@@ -14,9 +14,9 @@ class MovieInfo
   end
 
   private
-
+# "#{@query_params}"
   def get_json
-    Rails.cache.fetch(@query_params, :expires => 1.hour) do
+    Rails.cache.fetch("#{@query_params}", expires_in: 10.minutes) do
       response = Faraday.get("http://www.omdbapi.com?#{@query_params}&apikey=#{ENV['OMDB_KEY']}")
       JSON.parse(response.body)
     end
