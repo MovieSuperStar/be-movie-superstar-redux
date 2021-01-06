@@ -16,7 +16,7 @@ class MovieInfo
   private
 # "#{@query_params}"
   def get_json
-    Rails.cache.fetch("#{@query_params}", expires_in: 10.minutes) do
+    Rails.cache.fetch("#{@query_params}", expires_in: 59.minutes) do
       response = Faraday.get("http://www.omdbapi.com?#{@query_params}&apikey=#{ENV['OMDB_KEY']}")
       JSON.parse(response.body)
     end
@@ -26,9 +26,11 @@ class MovieInfo
     raw_json['Search'].each do |movie|
       find_vote = Vote.find_by(imdb_id: movie['imdbID'])
       find_vote.nil? ? movie['count'] = 0 : movie['count'] = find_vote.count
-      movie_id = movie['imdbID']
-      response = Faraday.get("http://www.omdbapi.com?i=#{movie_id}&apikey=#{ENV['OMDB_KEY']}")
-      movie['details'] = JSON.parse(response.body)
+      @movie_id = movie['imdbID']
+      Rails.cache.fetch("#{@movie_id}", expires_in: 59.minutes) do
+        @response = Faraday.get("http://www.omdbapi.com?i=#{@movie_id}&apikey=#{ENV['OMDB_KEY']}")
+      end
+      movie['details'] = JSON.parse(@response.body)
     end
   end
 
