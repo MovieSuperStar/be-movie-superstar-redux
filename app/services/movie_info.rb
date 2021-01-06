@@ -17,10 +17,9 @@ class MovieInfo
 # "#{@query_params}"
   def get_json
     Rails.cache.fetch("#{@query_params}", expires_in: 59.minutes) do
-      response = Faraday.get("http://www.omdbapi.com?#{@query_params}&apikey=#{ENV['OMDB_KEY']}")
-      JSON.parse(response)
+      Faraday.get("http://www.omdbapi.com?#{@query_params}&apikey=#{ENV['OMDB_KEY']}")
     end
-    # JSON.parse(response.body)
+    JSON.parse(Rails.cache.read("#{@query_params}").body)
   end
 
   def add_count_other(raw_json)
@@ -29,10 +28,10 @@ class MovieInfo
       find_vote.nil? ? movie['count'] = 0 : movie['count'] = find_vote.count
       @movie_id = movie['imdbID']
       Rails.cache.fetch("#{@movie_id}", expires_in: 59.minutes) do
-        response = Faraday.get("http://www.omdbapi.com?i=#{@movie_id}&apikey=#{ENV['OMDB_KEY']}")
-        movie['details'] = JSON.parse(response.body)
+        Faraday.get("http://www.omdbapi.com?i=#{@movie_id}&apikey=#{ENV['OMDB_KEY']}")
         # JSON.parse(response.body)
       end
+      movie['details'] = JSON.parse(Rails.cache.read("#{@movie_id}").body)
     end
   end
 
